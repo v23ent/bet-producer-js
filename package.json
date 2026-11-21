@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "kafka-js": "^0.0.0"
+    "@confluentinc/kafka-javascript": "^1.11.0"
   }
 }
