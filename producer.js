@@ -1,12 +1,13 @@
 import confluent from '@confluentinc/kafka-javascript';
+import 'dotenv/config';
 
 const { Kafka } = confluent.KafkaJS;
 const configKafka = {
-    "bootstrap.servers": "lkc-gq338g3.us-west-2.aws.public.confluent.cloud:9092",
+    "bootstrap.servers": process.env.KAFKA_BOOTSTRAP,
     "security.protocol": "SASL_SSL",
     "sasl.mechanisms": "PLAIN",
-    "sasl.username": "2QDHBCKO4LTH5HUG",
-    "sasl.password": "cfltD8ax9MktYvzRVXfFkrApcdj1+TEXReZM8fvlQ9QDMAEWYwbhnyhxfCEsrYwA"
+    "sasl.username": process.env.KAFKA_KEY,
+    "sasl.password": process.env.KAFKA_SECRET
 }
 
 const choice = (arr) => arr[Math.floor(Math.random() * arr.length)];
