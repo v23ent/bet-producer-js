@@ -33,30 +33,12 @@ function make_bet() {
 const kafka = new Kafka();
 let producer = kafka.producer(configKafka);
 
-await producer.connect();
-
-let bet = make_bet();
-let result = await producer.send({
-        "topic": "bets",
-        "messages": [
-            {
-                "key": JSON.stringify(bet.account_id),
-                "value": JSON.stringify(bet)
-            }
-        ]
-    }
-);
-
-await producer.disconnect();
-
-console.log(result);
-
 async function main() {
     await producer.connect();
 
     try {
-        let bet = make_bet();
-        let result = await producer.send({
+        const bet = make_bet();
+        const result = await producer.send({
             "topic": "bets",
             "messages": [
                 {
@@ -67,11 +49,12 @@ async function main() {
         });
 
         console.log(result);
-    } catch (error) {
-        console.error("Error sending message:", error);
     } finally {
         await producer.disconnect();
     }
 }
 
-main().catch(console.error);
+main().catch((error) => {
+    console.error("Error producing bet:", error);
+    process.exitCode = 1;
+});
