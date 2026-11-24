@@ -15,15 +15,17 @@ const choice = (arr) => arr[Math.floor(Math.random() * arr.length)];
 function make_bet() {
     const ACCOUNTS = Array.from({ length: 500 }, (_, i) => `acc-${String(i).padStart(4, "0")}`);
     const EVENTS = Array.from({ length: 20 }, (_, i) => `race-${i + 1}`);
+    const MARKETS = ["WIN", "PLACE", "EACH_WAY"];
+    const CHANNELS = ["APP", "WEB", "RETAIL"];
 
     return {
         "bet_id": crypto.randomUUID(),
         "account_id": choice(ACCOUNTS),
         "event_id": choice(EVENTS),
-        "market": choice(["WIN", "PLACE", "EACH_WAY"]),
+        "market": choice(MARKETS),
         "stake": 100,
         "odds": 1 + 20 * Math.random(),
-        "channel": choice(["APP", "WEB", "RETAIL"]),
+        "channel": choice(CHANNELS),
         "placed_at": Date.now()
     }
 }
@@ -48,3 +50,28 @@ let result = await producer.send({
 await producer.disconnect();
 
 console.log(result);
+
+async function main() {
+    await producer.connect();
+
+    try {
+        let bet = make_bet();
+        let result = await producer.send({
+            "topic": "bets",
+            "messages": [
+                {
+                    "key": JSON.stringify(bet.account_id),
+                    "value": JSON.stringify(bet)
+                }
+            ]
+        });
+
+        console.log(result);
+    } catch (error) {
+        console.error("Error sending message:", error);
+    } finally {
+        await producer.disconnect();
+    }
+}
+
+main().catch(console.error);
